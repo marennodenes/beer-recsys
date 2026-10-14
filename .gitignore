@@ -1,0 +1,8 @@
+# Data (download from the data-v1 release instead)
+data/raw/
+data/processed/
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+.venv/
