@@ -3,20 +3,24 @@
 A school project in Business Intelligence. We build a system that recommends beers, using ratings from the
 website RateBeer.
 
-**The idea:** A beer app is launching in Norway. It has many users in other countries, but none in Norway yet.
-Can it still give good recommendations to its first Norwegian users?
+**The idea:** A beer app is launching in Norway. It has many users in other countries, but only a few in Norway.
+Can it still give good recommendations to its Norwegian users?
 
 This matters for business because a company entering a new market has little local data. If data from
 other markets works, it can give good recommendations from day one.
 
-## Questions and hypotheses
+## Research questions
 
 - **RQ1:** Can data from other countries give good recommendations to new users in Norway?
-  - **H1:** A model trained on other countries beats simply recommending the most popular beers.
-- **RQ2:** Does it help to look at where the beer comes from and which countries are similar to Norway?
-  - **H2:** It helps to give a bonus to beers from the user's own country.
-  - **H3:** Data from Nordic users (Sweden, Denmark, Finland) helps more than the same amount of data from
-    other countries.
+- **RQ2:** Does it help to give extra weight to beers from Noway?
+- **RQ3:** Does data from countries similar to Norway help more than data from other countries?
+
+## Hypotheses
+
+- **H1 (RQ1):** A model trained on other countries beats the general baseline recommendations.
+- **H2 (RQ2):** The model from H1 gives better recommendations when Norwegian beers get a bonus in the ranking.
+- **H3 (RQ3):** Data from Nordic users (Sweden, Denmark, Finland) helps more than the same amount of data from
+  other countries.
 
 ## How to run
 
@@ -36,14 +40,17 @@ On Windows, use `python` instead of `python3` and `.venv\Scripts\activate` inste
 
 ## Data
 
-RateBeer data from Lederrey & West (2018). It is not in the repo. `setup_project.py` downloads it.
+RateBeer data from Lederrey & West (2018). It is not in the repo, but can be find through releases on github and `setup_project.py` downloads it. We have been given premission from Lederrey and West to use the dataset.
 
 We keep ratings from 2010 to mid-2017 and find each user's and brewery's country from their location.
 After cleaning there are about 4.9 million ratings from 36,700 users. 609 of the users are Norwegian.
+1,951 users are from the other Nordic countries (Sweden 862, Denmark 716, Finland 373), with about 774,000
+ratings in total. Run D is trained on these, plus the first 5 ratings of each Norwegian test user.
 
 ## How we test
 
-1. **Training data:** all ratings from users outside Norway.
+1. **Training data:** all ratings from users outside Norway. The BPR models also get each test user's first
+   5 ratings (see 3). The other Norwegian users (fewer than 15 ratings) are not used.
 2. **Test users:** the 180 Norwegian users with at least 15 ratings.
 3. The models only get each test user's **first 5 ratings**. The rest are hidden and used as the
    **answer key**.
@@ -61,8 +68,8 @@ same people). The runs differ in training data or in a bonus.
 |---|---|---|
 | Baseline | Most popular beers | (comparison point) |
 | B | BPR on all other countries | H1 |
-| C | B + bonus for beers from the user's country | H2 |
-| D | BPR on Nordic users only | H3 |
+| C | B + bonus for norweagian beers | H2 |
+| D | BPR on Nordic users only (not Norway) | H3 |
 | E | BPR on other countries, same amount of data as D | H3 |
 
 ## Measuring
@@ -99,10 +106,12 @@ results/     tables and figures for the report
 - People may drink local beer because it is what the shops sell, not because of taste.
 - The data is from 2010–2017, and most users are from the US.
 - Only 90 test users, so results can change a bit between groups.
-- The best bonus and model size were the largest we tried. Larger values might work even better.
+- We tested a few settings on the validation users. For both the bonus (0 to 1.0) and the model size (32, 64
+  and 128 factors), the largest value gave the best result. We did not try larger values, so they might work
+  even better.
 - The Nordic data (D) has fewer users with more ratings each than E. This may explain part of the difference.
 
-## Reference
+## Dataset reference
 
 Lederrey, G., & West, R. (2018). When Sheep Shop: Measuring Herding Effects in Product Ratings with Natural
 Experiments. *Proceedings of The Web Conference (WWW 2018)*.
