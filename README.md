@@ -1,4 +1,4 @@
-# beer-recsys
+# Recommending Beer in a New Market
 
 A school project in Business Intelligence. We build a system that recommends beers, using ratings from the
 website RateBeer.
@@ -84,6 +84,19 @@ Every hidden beer counts as a hit, also ones the user rated low. As a check, we 
 with only the hidden beers rated 3.5 or higher (beers the user **liked**).
 
 ## Results
+
+![Recall, NDCG and coverage for each run](results/metrics_by_run.png)
+
+- Plain BPR (B) is worse than recommending the most popular beers (H1 rejected).
+- A bonus for Norwegian beers makes BPR much better (H2 supported), and Nordic data beats the same amount of
+  other data (H3 supported).
+- C has the highest NDCG, but it is not significantly better than the popular list.
+- Users with few ratings get the worst recommendations, and the Norwegian bonus mostly helps users who
+  drink a lot of Norwegian beer ([failure analysis](results/failure_analysis.png)).
+
+![NDCG for each run, all hidden beers vs. only liked beers](results/liked_check.png)
+
+- When only beers the user liked count, H1–H3 still hold, but the popular lists are best.
 
 See [04_results.ipynb](notebooks/04_results.ipynb) for all results and a summary. Tables and figures for the
 report are in [results/](results/):
