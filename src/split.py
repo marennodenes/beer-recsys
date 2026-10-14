@@ -10,6 +10,7 @@ TARGET_COUNTRY = "Norway"
 MIN_RATINGS = 15
 N_HISTORY = 5
 SPLIT_FILES = ("train", "history", "hidden")
+NORDIC = ["Sweden", "Denmark", "Finland"]
 
 
 def split_history_hidden(target_ratings):
@@ -45,6 +46,17 @@ def make_split(ratings):
     history = history.assign(group=history["user_id"].map(groups))
     hidden = hidden.assign(group=hidden["user_id"].map(groups))
     return train.reset_index(drop=True), history.reset_index(drop=True), hidden.reset_index(drop=True)
+
+
+def nordic_train(train):
+    """Training ratings from Nordic users only (run D)."""
+    return train[train["user_country"].isin(NORDIC)]
+
+
+def non_nordic_sample(train, n_ratings):
+    """Random sample of n_ratings from users outside the Nordics and Norway (run E)."""
+    non_nordic = train[~train["user_country"].isin(NORDIC + [TARGET_COUNTRY])]
+    return non_nordic.sample(n=n_ratings, random_state=SEED)
 
 
 def save_split(train, history, hidden):

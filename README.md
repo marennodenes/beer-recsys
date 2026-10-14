@@ -1,42 +1,26 @@
 # beer-recsys
 
-A school project for a Business Intelligence course. We build a system that recommends beers to users,
-using real rating data from the website RateBeer. We test if ratings from people in other countries can
-help give good recommendations to new users in Norway, and if it helps to look at where the beer comes
-from and how culturally similar countries are.
+A school project in Business Intelligence. We build a system that recommends beers, using ratings from the
+website RateBeer.
 
-## Research questions
+**The idea:** A beer app is launching in Norway. It has many users in other countries, but none in Norway yet.
+Can it still give good recommendations to its first Norwegian users?
 
-> **RQ1:** Can data from users in other countries give good beer recommendations to new users in Norway?
->
-> **RQ2:** Do recommendations improve when we consider where the beer comes from and how culturally
-> similar the countries are?
+This matters for business because a company entering a new market has little local data. If data from
+other markets works, it can give good recommendations from day one.
 
-RQ1 is answered by H1. RQ2 is answered by H2 (where the beer comes from) and H3 (cultural similarity).
+## Questions and hypotheses
 
-## Scenario
+- **RQ1:** Can data from other countries give good recommendations to new users in Norway?
+  - **H1:** A model trained on other countries beats simply recommending the most popular beers.
+- **RQ2:** Does it help to look at where the beer comes from and which countries are similar to Norway?
+  - **H2:** It helps to give a bonus to beers from the user's own country.
+  - **H3:** Data from Nordic users (Sweden, Denmark, Finland) helps more than the same amount of data from
+    other countries.
 
-An international beer app is launching in Norway. It already has many users in other countries, but no
-Norwegian users yet. The first Norwegian users rate a few beers each. What should the app recommend to them?
+## How to run
 
-Why this matters for business:
-- Good recommendations help new customers find products they like, which keeps them using the app.
-- A company entering a new market has little local data. If data from existing markets works, it can grow faster.
-- It helps decide whether to promote local products and which markets' data is most useful.
-
-## Hypotheses
-
-- **H1 (transfer):** A model trained on users from other countries gives better recommendations to new
-  Norwegian users than simply recommending the most popular beers.
-- **H2 (home country):** Recommendations improve when the model knows whether a beer comes from the
-  user's own country.
-- **H3 (cultural similarity):** Data from Nordic users (Sweden, Denmark, Finland) helps Norwegian users more
-  than the same amount of data from the rest of the world.
-
-## Setup
-
-Run this once from the project folder. It creates a virtual environment, installs the libraries
-and downloads the data (about 1 GB, takes a few minutes):
+Run this once from the project folder. It installs the libraries and downloads the data (about 1 GB):
 
 ```
 python3 -m venv .venv          # Mac (Windows: python -m venv .venv)
@@ -45,101 +29,82 @@ source .venv/bin/activate      # Mac
 python setup_project.py
 ```
 
-Activate `.venv` every time you open a new terminal. In VS Code, pick `.venv` as the Python
-interpreter and it is used automatically, also in notebooks.
+In VS Code, pick `.venv` as the Python interpreter. Then run the notebooks in order:
+
+| Notebook | What it does | Time |
+|---|---|---|
+| `01_data_overview` | Loads and cleans the data | ~1 min |
+| `02_split` | Splits the data into training data and test users | ~1 min |
+| `03_models` | Trains and scores all models | 10+ min |
+| `04_results` | Tables, figures, hypothesis tests and failure analysis | seconds |
 
 ## Data
 
-RateBeer data from Lederrey & West (2018), "When Sheep Shop" (WWW 2018). Not included in the repo.
-The data is stored in the `data-v1` GitHub release. `setup_project.py` downloads the
-files we need into `data/raw/`. Load them with `load_ratings()`, `load_users()`, `load_breweries()`
-and `load_beers()` from `src/data.py`.
+RateBeer data from Lederrey & West (2018). It is not in the repo. `setup_project.py` downloads it.
 
-| File | Used for |
-|---|---|
-| `ratings.txt.gz` | One rating per record: user_id, beer_id, brewery_id, date, rating (1–5) |
-| `users.csv` | `location` = user's country (US users as "United States, <State>") |
-| `breweries.csv` | `location` = brewery's country |
-| `beers.csv` | Beer name, style, ABV |
+We keep ratings from 2010 to mid-2017 and find each user's and brewery's country from their location.
+After cleaning there are about 4.9 million ratings from 36,700 users. 609 of the users are Norwegian.
 
-`reviews.txt.gz` is not needed (same ratings with text).
+## How we test
 
-Cleaning rules:
-- Keep ratings from **2010-01-01 to 2017-07-31**.
-- Country = text before the first comma in `location` ("United States, Texas" → "United States").
-- Merge England, Scotland, Wales and Northern Ireland into "United Kingdom".
-- Drop users with no location. Drop duplicates.
+1. **Training data:** all ratings from users outside Norway.
+2. **Test users:** the 180 Norwegian users with at least 15 ratings.
+3. The models only get each test user's **first 5 ratings**. The rest are hidden and used as the
+   **answer key**.
+4. The test users are split in two groups of 90: **validation** (to pick settings) and **test** (for the
+   final numbers).
 
-What we know so far (2010–2017, users with a country): about 4.9 million ratings, 36,700 users, 23 countries
-with at least 50 users. Norway has about 609 users and 184,000 ratings. Norwegians rate Norwegian beers far
-more often than foreigners do, but give them about the same score as foreigners do.
+The hidden ratings are never used for training.
 
-## Experiment setup
+## Models
 
-**Target market:** Norway. **Source data:** all other countries.
+There are two models: **popularity** (the most rated beers) and **BPR** (learns which beers are liked by the
+same people). The runs differ in training data or in a bonus.
 
-Treat every rating as a positive interaction (the user tried the beer). The task is to rank beers the user
-has not rated yet.
+| Run | What it is | Tests |
+|---|---|---|
+| Baseline | Most popular beers | (comparison point) |
+| B | BPR on all other countries | H1 |
+| C | B + bonus for beers from the user's country | H2 |
+| D | BPR on Nordic users only | H3 |
+| E | BPR on other countries, same amount of data as D | H3 |
 
-Norwegian users are split like this:
-1. Use Norwegian users with at least 15 ratings as test users.
-2. For each test user, sort ratings by date. Keep the **first 5** as known history.
-3. The rest of their ratings are **hidden** and used only as the answer key.
-4. Split test users 50/50 into validation (for tuning) and test (for final results). Fixed random seed.
+## Measuring
 
-No other Norwegian data is used in training. This copies a real new market: the app only knows the first
-few ratings of its first Norwegian users.
+Each model gives every test user a top 10. We compare it with the user's hidden beers:
+- **Recall@10:** how many of the hidden beers are in the top 10.
+- **NDCG@10:** like recall, but hits at the top count more. Our main measure.
+- **Coverage@10:** how many different beers are recommended in total (variety).
 
-**Never use hidden ratings for training, popularity counts, or any feature.**
+## Results
 
-## Models and runs
+See [04_results.ipynb](notebooks/04_results.ipynb) for all results and a summary. Tables and figures for the
+report are in [results/](results/):
 
-There are only two models: **popularity** and **BPR**. The runs use the same BPR code with different
-training data, or with a small bonus added.
+- [Main results](results/test_results.csv)
+- [Hypothesis tests](results/hypothesis_tests.csv)
+- [Figure: all runs](results/metrics_by_run.png)
+- [Figure: failure analysis](results/failure_analysis.png)
+- [Figure: D vs. E](results/failure_analysis_d_vs_e.png)
 
-| Run | Method | Training data | Answers |
-|---|---|---|---|
-| Baseline | Most popular beers (count of ratings) | All other countries | Comparison point |
-| B | BPR (`implicit` library) | All other countries | H1 |
-| C | B + home-country bonus | Same as B | H2 |
-| D *(if time)* | BPR | Nordic countries only (SE, DK, FI) | H3 |
-| E *(if time)* | BPR | Random sample from all other non-Nordic countries, same number of ratings as D | H3 |
-
-- All BPR runs also include the test users' first 5 ratings, so the model knows a little about each user.
-- D and E must have the same amount of data, so the only difference is where the data comes from.
-- Start with Baseline, B and C. Add D and E at the end if there is time.
-- Do not recommend beers the user has already rated.
-- Run C: `score = BPR score + w * (beer is from the user's country)`. Try w in {0, 0.1, 0.2, 0.5, 1.0}
-  on the validation users and pick the best. If best w = 0, the home country does not help.
-- Tune BPR settings on validation users only. Report final numbers on test users only.
-
-## Evaluation
-
-Metrics at K = 10 (binary relevance):
-- **Recall@10:** share of a user's hidden beers that appear in their top 10.
-- **NDCG@10:** like recall, but hits near the top count more.
-- **Coverage@10:** share of all beers that appear in at least one top-10 list.
-
-**Failure analysis:** Which test users get poor results? Look at how many ratings they have
-and which beer styles they like.
-
-## Project structure
+## Folders
 
 ```
-data/raw/         original files (not in git)
-data/processed/   cleaned data (not in git)
-notebooks/        01_data_overview, 02_split, 03_models, 04_results
-src/              reusable code (data loading, split, models, metrics)
-results/          tables and figures for the report
+data/        the data (not in git)
+notebooks/   the four notebooks
+src/         code the notebooks use
+results/     tables and figures for the report
 ```
 
-## Limitations to mention in the report
+## Limitations
 
-- Country is a rough stand-in for culture.
-- We do not know where a rating was made, only where the user lives and where the beer is brewed.
-- Home-country effects may come from what is sold in each country, not only taste.
-- Data is from 2010–2017 and mostly from Western countries.
-- Most users are from the US.
+- Country is a rough way to measure culture.
+- We know where the user lives, not where they drank the beer.
+- People may drink local beer because it is what the shops sell, not because of taste.
+- The data is from 2010–2017, and most users are from the US.
+- Only 90 test users, so results can change a bit between groups.
+- The best bonus and model size were the largest we tried. Larger values might work even better.
+- The Nordic data (D) has fewer users with more ratings each than E. This may explain part of the difference.
 
 ## Reference
 

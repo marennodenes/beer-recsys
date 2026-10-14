@@ -1,0 +1,4 @@
+hypothesis,question,comparison,ndcg reference,ndcg new,ndcg change,recall change,users better,users worse,p-value,result
+H1,Does BPR on foreign data beat the popular list?,B vs baseline,0.33232654193845124,0.2510776697375794,-0.24448505294506273,-0.20393443120893395,23,43,0.0025672739063226906,Rejected
+H2,Does a home-country bonus help?,C vs B,0.2510776697375794,0.3599696917260426,0.4336985527318087,1.0668010023010175,57,13,3.136057856933967e-07,Supported
+H3,Is Nordic data better than the same amount of non-Nordic data?,D vs E,0.17439661393728936,0.28211828342096357,0.6176821157915913,0.3194323749286867,46,17,3.5118840729059085e-06,Supported
