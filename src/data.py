@@ -17,6 +17,10 @@ RELEASE_URL = (
 # reviews.txt.gz is skipped: same ratings with text, and almost 1 GB
 NEEDED_FILES = {"ratings.txt.gz", "users.csv", "breweries.csv", "beers.csv"}
 
+START_DATE = "2010-01-01"
+END_DATE = "2017-07-31"
+UK_PARTS = {"England", "Scotland", "Wales", "Northern Ireland"}
+
 
 def download_data():
     """Download the needed files from the GitHub release into data/raw/, if missing."""
@@ -61,9 +65,9 @@ def load_ratings():
     """Load all ratings as user_id, beer_id, brewery_id, date, rating.
 
     The raw file is slow to read, so the result is saved to
-    data/processed/ratings.parquet the first time and read from there after.
+    data/processed/ratings_raw.parquet the first time and read from there after.
     """
-    cache = PROCESSED_DIR / "ratings.parquet"
+    cache = PROCESSED_DIR / "ratings_raw.parquet"
     if cache.exists():
         return pd.read_parquet(cache)
 
@@ -88,5 +92,40 @@ def load_ratings():
     ratings = ratings[["user_id", "beer_id", "brewery_id", "date", "rating"]]
 
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    ratings.to_parquet(cache, index=False)
+    return ratings
+
+
+def country_from_location(location):
+    """Country from a location column: text before the first comma, UK parts merged."""
+    country = location.str.split(",").str[0].str.strip()
+    return country.replace(dict.fromkeys(UK_PARTS, "United Kingdom"))
+
+
+def load_clean_ratings():
+    """Ratings from 2010-01-01 to 2017-07-31 with user_country and beer_country.
+
+    Users with no location and duplicate user-beer pairs are dropped.
+    Saved to data/processed/ratings_clean.parquet the first time.
+    """
+    cache = PROCESSED_DIR / "ratings_clean.parquet"
+    if cache.exists():
+        return pd.read_parquet(cache)
+
+    ratings = load_ratings()
+    ratings = ratings[ratings["date"].between(START_DATE, f"{END_DATE} 23:59:59")]
+
+    # users.csv lists a few users more than once
+    users = load_users().dropna(subset=["location"]).drop_duplicates("user_id")
+    users["user_country"] = country_from_location(users["location"])
+    breweries = load_breweries().rename(columns={"id": "brewery_id"})
+    breweries["beer_country"] = country_from_location(breweries["location"])
+
+    ratings = ratings.merge(users[["user_id", "user_country"]], on="user_id")
+    ratings = ratings.merge(breweries[["brewery_id", "beer_country"]], on="brewery_id", how="left")
+    # Keep the first rating when a user rated the same beer twice
+    ratings = ratings.sort_values("date").drop_duplicates(["user_id", "beer_id"])
+    ratings = ratings.reset_index(drop=True)
+
     ratings.to_parquet(cache, index=False)
     return ratings
