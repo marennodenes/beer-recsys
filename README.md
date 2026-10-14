@@ -103,6 +103,9 @@ Metrics at K = 10 (binary relevance):
 - **NDCG@10:** like recall, but hits near the top count more.
 - **Coverage@10:** share of all beers that appear in at least one top-10 list.
 
+**Failure analysis:** Which test users get poor results? Look at how many ratings they have
+and which beer styles they like.
+
 ## Project structure
 
 ```
