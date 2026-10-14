@@ -40,7 +40,11 @@ On Windows, use `python` instead of `python3` and `.venv\Scripts\activate` inste
 
 ## Data
 
-RateBeer data from Lederrey & West (2018). It is not in the repo, but can be find through releases on github and `setup_project.py` downloads it. We have been given premission from Lederrey and West to use the dataset.
+RateBeer data from Lederrey & West (2018). It is not in the repo, but can be found under releases on GitHub, and `setup_project.py` downloads it.
+
+**Permission:** Lederrey and West gave us permission by email to use the dataset in this project. The permission
+is only for this project. To use the dataset for anything else, ask the owners by email:
+robert.bob.west@gmail.com and glederre@gmail.com.
 
 We keep ratings from 2010 to mid-2017 and find each user's and brewery's country from their location.
 After cleaning there are about 4.9 million ratings from 36,700 users. 609 of the users are Norwegian.
