@@ -92,6 +92,7 @@ report are in [results/](results/):
 - [Hypothesis tests](results/hypothesis_tests.csv)
 - [Baseline → A → C](results/bonus_steps.csv)
 - [Check: only liked beers](results/liked_tests.csv)
+- [Figure: only liked beers](results/liked_check.png)
 - [Figure: all runs](results/metrics_by_run.png)
 - [Figure: failure analysis](results/failure_analysis.png)
 - [Figure: D vs. E](results/failure_analysis_d_vs_e.png)
