@@ -103,11 +103,6 @@ Metrics at K = 10 (binary relevance):
 - **NDCG@10:** like recall, but hits near the top count more.
 - **Coverage@10:** share of all beers that appear in at least one top-10 list.
 
-Report the number of test users. Run with a few random seeds and show the spread.
-
-**Failure analysis:** Which test users get poor results? Look at number of ratings, favourite styles, and
-how many of their hidden beers are Norwegian.
-
 ## Project structure
 
 ```
@@ -117,13 +112,6 @@ notebooks/        01_data_overview, 02_split, 03_models, 04_results
 src/              reusable code (data loading, split, models, metrics)
 results/          tables and figures for the report
 ```
-
-## Guidelines
-
-- Python 3.11, pandas, numpy, implicit, matplotlib.
-- Keep code simple and commented. Group members are not all programmers.
-- Write all code, comments and output in English.
-- Data files must never be committed.
 
 ## Limitations to mention in the report
 
