@@ -59,6 +59,7 @@ from src.metrics import recall_at_k
 | `matplotlib` / `seaborn` | Figures |
 | `pyarrow` | Save/read `.parquet` |
 
+- Everyone uses a virtual environment in `.venv/` (see Setup in `README.md`). Never install libraries outside it.
 - All libraries must be listed in `requirements.txt`.
 - Ask the group before adding a new library.
 - Own code is only fine when no library fits well, e.g. our metrics in `src/metrics.py`.

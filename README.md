@@ -35,12 +35,18 @@ Why this matters for business:
 
 ## Setup
 
-Run this once from the project folder. It installs the libraries and downloads the data
-(about 1 GB, takes a few minutes):
+Run this once from the project folder. It creates a virtual environment, installs the libraries
+and downloads the data (about 1 GB, takes a few minutes):
 
 ```
+python3 -m venv .venv          # Mac (Windows: python -m venv .venv)
+source .venv/bin/activate      # Mac
+.venv\Scripts\activate         # Windows
 python setup_project.py
 ```
+
+Activate `.venv` every time you open a new terminal. In VS Code, pick `.venv` as the Python
+interpreter and it is used automatically, also in notebooks.
 
 ## Data
 
