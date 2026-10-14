@@ -12,7 +12,7 @@ other markets works, it can give good recommendations from day one.
 ## Research questions
 
 - **RQ1:** Can data from other countries give good recommendations to new users in Norway?
-- **RQ2:** Does it help to give extra weight to beers from Noway?
+- **RQ2:** Does it help to give extra weight to beers from Norway?
 - **RQ3:** Does data from countries similar to Norway help more than data from other countries?
 
 ## Hypotheses
