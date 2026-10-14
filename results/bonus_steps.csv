@@ -1,3 +1,4 @@
 step,question,comparison,ndcg before,ndcg after,ndcg change,recall change,users better,users worse,p-value,result
 Baseline → A,Does the bonus help the popular list?,A vs baseline,0.33232654193845124,0.30953285889228205,-0.06858821120099012,0.36179057200067,26,44,0.25378059006603426,Not significant
 A → C,Does BPR help when the bonus is used?,C vs A,0.30953285889228205,0.3599696917260426,0.16294500368800158,0.20819540779864987,46,25,0.004323346063781403,Supported
+Baseline → C,Does C beat the popular list?,C vs baseline,0.33232654193845124,0.3599696917260426,0.0831806861599127,0.6453091154747059,40,27,0.07919428979334217,Not significant

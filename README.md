@@ -80,6 +80,9 @@ Each model gives every test user a top 10. We compare it with the user's hidden 
 - **NDCG@10:** like recall, but hits at the top count more. Our main measure.
 - **Coverage@10:** how many different beers are recommended in total (variety).
 
+Every hidden beer counts as a hit, also ones the user rated low. As a check, we also score the models
+with only the hidden beers rated 3.5 or higher (beers the user **liked**).
+
 ## Results
 
 See [04_results.ipynb](notebooks/04_results.ipynb) for all results and a summary. Tables and figures for the
@@ -88,6 +91,7 @@ report are in [results/](results/):
 - [Main results](results/test_results.csv)
 - [Hypothesis tests](results/hypothesis_tests.csv)
 - [Baseline → A → C](results/bonus_steps.csv)
+- [Check: only liked beers](results/liked_tests.csv)
 - [Figure: all runs](results/metrics_by_run.png)
 - [Figure: failure analysis](results/failure_analysis.png)
 - [Figure: D vs. E](results/failure_analysis_d_vs_e.png)
