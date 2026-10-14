@@ -20,23 +20,19 @@ other markets works, it can give good recommendations from day one.
 
 ## How to run
 
-Run this once from the project folder. It installs the libraries and downloads the data (about 1 GB):
+**1. Setup (only once).** Open a terminal in the project folder and run:
 
 ```
-python3 -m venv .venv          # Mac (Windows: python -m venv .venv)
-source .venv/bin/activate      # Mac
-.venv\Scripts\activate         # Windows
+python3 -m venv .venv
+source .venv/bin/activate
 python setup_project.py
 ```
 
-In VS Code, pick `.venv` as the Python interpreter. Then run the notebooks in order:
+This installs everything and downloads the data. It takes a few minutes.
+On Windows, use `python` instead of `python3` and `.venv\Scripts\activate` instead of `source .venv/bin/activate`.
 
-| Notebook | What it does | Time |
-|---|---|---|
-| `01_data_overview` | Loads and cleans the data | ~1 min |
-| `02_split` | Splits the data into training data and test users | ~1 min |
-| `03_models` | Trains and scores all models | 10+ min |
-| `04_results` | Tables, figures, hypothesis tests and failure analysis | seconds |
+**2. Run the notebooks in order:** 01 → 02 → 03 → 04. In VS Code, choose `.venv` as the kernel.
+03 trains the models and takes about 20 minutes. The others take a minute or less.
 
 ## Data
 
