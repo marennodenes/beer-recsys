@@ -9,11 +9,20 @@ from src.metrics import K
 from src.split import SEED
 
 
-def popular_beers(train):
-    """Beer ids sorted by number of ratings in train, most rated first."""
-    counts = train.groupby("beer_id").size().reset_index(name="n_ratings")
+def popular_beers(train, home_country=None, home_bonus=0):
+    """Beer ids sorted by popularity in train, most popular first.
+
+    score = n_ratings / most ratings of any beer + home_bonus * (beer is from home_country)
+    """
+    counts = train.groupby("beer_id").agg(
+        n_ratings=("beer_id", "size"), beer_country=("beer_country", "first")
+    ).reset_index()
+    counts["score"] = (
+        counts["n_ratings"] / counts["n_ratings"].max()
+        + home_bonus * (counts["beer_country"] == home_country)
+    )
     # beer_id breaks ties so the order is the same every run
-    counts = counts.sort_values(["n_ratings", "beer_id"], ascending=[False, True])
+    counts = counts.sort_values(["score", "beer_id"], ascending=[False, True])
     return counts["beer_id"].tolist()
 
 

@@ -67,8 +67,9 @@ same people). The runs differ in training data or in a bonus.
 | Run | What it is | Tests |
 |---|---|---|
 | Baseline | Most popular beers | (comparison point) |
+| A | Baseline + bonus for Norwegian beers (same bonus as C) | Explains why C beats the baseline |
 | B | BPR on all other countries | H1 |
-| C | B + bonus for norweagian beers | H2 |
+| C | B + bonus for Norwegian beers | H2 |
 | D | BPR on Nordic users only (not Norway) | H3 |
 | E | BPR on other countries, same amount of data as D | H3 |
 
@@ -86,6 +87,7 @@ report are in [results/](results/):
 
 - [Main results](results/test_results.csv)
 - [Hypothesis tests](results/hypothesis_tests.csv)
+- [Baseline → A → C](results/bonus_steps.csv)
 - [Figure: all runs](results/metrics_by_run.png)
 - [Figure: failure analysis](results/failure_analysis.png)
 - [Figure: D vs. E](results/failure_analysis_d_vs_e.png)
@@ -103,6 +105,8 @@ results/     tables and figures for the report
 
 - Country is a rough way to measure culture.
 - We know where the user lives, not where they drank the beer.
+- Beer country comes from the brewery. Beers brewed in Norway for foreign brands (e.g. Mikkeller at Lervig)
+  count as Norwegian.
 - People may drink local beer because it is what the shops sell, not because of taste.
 - The data is from 2010–2017, and most users are from the US.
 - Only 90 test users, so results can change a bit between groups.
