@@ -33,10 +33,21 @@ Why this matters for business:
 - **H3 (cultural similarity):** Data from Nordic users (Sweden, Denmark, Finland) helps Norwegian users more
   than the same amount of data from the rest of the world.
 
+## Setup
+
+Run this once from the project folder. It installs the libraries and downloads the data
+(about 1 GB, takes a few minutes):
+
+```
+python setup_project.py
+```
+
 ## Data
 
 RateBeer data from Lederrey & West (2018), "When Sheep Shop" (WWW 2018). Not included in the repo.
-Download `beerDataset.tar.gz` from the `data-v1` release and unpack it into `data/raw/`.
+The data is stored in the `data-v1` GitHub release. `setup_project.py` downloads the
+files we need into `data/raw/`. Load them with `load_ratings()`, `load_users()`, `load_breweries()`
+and `load_beers()` from `src/data.py`.
 
 | File | Used for |
 |---|---|

@@ -1,7 +1,7 @@
 # Code standard
 
 Shared rules for the code in this project. Read `README.md` first to understand the task.
-Applies to us and to Claude Code.
+Applies to us and to our AI assistants (Claude Code and Codex).
 
 ## Main rules
 
@@ -15,7 +15,7 @@ Applies to us and to Claude Code.
 
 | Folder | What goes there |
 |---|---|
-| `data/raw/` | Original RateBeer files, unchanged. Never edit these. |
+| `data/raw/` | Original RateBeer files, downloaded by `setup_project.py`. Never edit these. |
 | `data/processed/` | Cleaned data and our split, saved as `.parquet`. |
 | `notebooks/` | Analysis and runs, numbered in order (see below). |
 | `src/` | Reusable code that the notebooks import. |
@@ -85,7 +85,7 @@ from src.metrics import recall_at_k
 - Don't work in the same notebook as someone else at the same time. Tell the group who is working where.
 - Don't commit large files, data or passwords.
 
-## For Claude Code
+## For AI assistants (Claude Code and Codex)
 
 - Read `README.md` and this file before writing code.
 - Follow the folder structure and libraries above. Don't create new folders or files without a reason.
