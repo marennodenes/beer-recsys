@@ -1,4 +1,4 @@
-"""Recommendation models: popularity baseline and BPR (home-country bonus comes later)."""
+"""Recommendation models: popularity baseline, BPR and home-country bonus."""
 
 import numpy as np
 import pandas as pd
@@ -27,9 +27,8 @@ def recommend_popular(ranking, history, k=K):
     }
 
 
-
-def recommend_bpr(train, history, factors=64, k=K):
-    """Top k beers from a BPR model for each user in history, skipping beers they already rated."""
+def train_bpr(train, history, factors=64):
+    """Fit BPR on train plus the Norwegian history and keep what is needed to recommend."""
     # The Norwegian history is included so the model knows a little about each test user
     ratings = pd.concat([train, history])
     user_codes, user_ids = pd.factorize(ratings["user_id"])
@@ -39,7 +38,30 @@ def recommend_bpr(train, history, factors=64, k=K):
     model = BayesianPersonalizedRanking(factors=factors, random_state=SEED)
     model.fit(matrix, show_progress=False)
 
-    users = history["user_id"].unique()
-    rows = user_ids.get_indexer(users)
-    top_beers, _ = model.recommend(rows, matrix[rows], N=k, filter_already_liked_items=True)
-    return {user_id: list(beer_ids[beers]) for user_id, beers in zip(users, top_beers)}
+    beer_countries = ratings.drop_duplicates("beer_id").set_index("beer_id")["beer_country"]
+    return {
+        "model": model,
+        "matrix": matrix,
+        "user_ids": user_ids,
+        "beer_ids": beer_ids,
+        "beer_countries": beer_countries.reindex(beer_ids).to_numpy(),
+    }
+
+
+def recommend_bpr(bpr, history, home_bonus=0, k=K):
+    """Top k beers per user from BPR, skipping beers they already rated.
+
+    score = BPR score + home_bonus * (beer is from the user's country)
+    """
+    users = history.drop_duplicates("user_id")
+    rows = bpr["user_ids"].get_indexer(users["user_id"])
+    is_home = {country: bpr["beer_countries"] == country for country in users["user_country"].unique()}
+
+    recommendations = {}
+    for user_id, country, row in zip(users["user_id"], users["user_country"], rows):
+        scores = bpr["model"].item_factors @ bpr["model"].user_factors[row]
+        scores = scores + home_bonus * is_home[country]
+        scores[bpr["matrix"][row].indices] = -np.inf
+        top_beers = np.argsort(-scores)[:k]
+        recommendations[user_id] = list(bpr["beer_ids"][top_beers])
+    return recommendations
